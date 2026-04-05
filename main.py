@@ -473,7 +473,7 @@ HTML_CONTENT = """
         </div>
 
         <footer>
-            <p>Crypto Backtester v2.0 | Powered by Binance API</p>
+            <p>Crypto Backtester v2.0 | Real-time Market Data</p>
         </footer>
     </div>
 
@@ -669,7 +669,16 @@ async def backtest(req: BacktestRequest):
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        error_msg = str(e)
+        # Make error messages user-friendly
+        if "Failed to connect" in error_msg or "Connection" in error_msg:
+            raise HTTPException(status_code=503, detail="Cannot connect to market data servers. Please try again later.")
+        elif "No market data" in error_msg or "No data available" in error_msg:
+            raise HTTPException(status_code=404, detail=error_msg)
+        elif "Binance" in error_msg or "451" in error_msg:
+            raise HTTPException(status_code=503, detail="Market data temporarily unavailable. Please try a different time period or symbol.")
+        else:
+            raise HTTPException(status_code=500, detail="An error occurred. Please try again.")
 
 
 if __name__ == "__main__":
