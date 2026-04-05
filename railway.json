@@ -1,0 +1,22 @@
+{
+  "name": "crypto-backtester",
+  "nixpacksVersion": "latest",
+  "phases": {
+    "setup": {
+      "nixpkgs": ["python310", "pip"],
+      "aptPackages": []
+    },
+    "build": {
+      "pip": {
+        "packages": ["fastapi", "uvicorn", "pandas", "httpx", "pydantic"]
+      }
+    },
+    "start": {
+      "command": "uvicorn main:app --host 0.0.0.0 --port $PORT"
+    }
+  },
+  "config": {
+    "healthCheckPath": "/",
+    "staticPort": 8000
+  }
+}
